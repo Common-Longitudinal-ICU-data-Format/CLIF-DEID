@@ -1,0 +1,7 @@
+.venv/
+dist/
+__pycache__/
+*.py[cod]
+De-id/
+Non-Share/
+*.tmp

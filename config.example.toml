@@ -1,0 +1,47 @@
+version = "2.1"
+input_dir = "/path/to/clif-tables"
+# Defaults to CLIF-DEID/De-id when omitted.
+# output_dir = "/path/to/deidentified-output"
+# Defaults to CLIF-DEID/Non-Share when omitted.
+# non_share_dir = "/path/to/private-audit"
+
+[tables]
+adt = 1
+code_status = 1
+crrt_therapy = 1
+hospital_diagnosis = 1
+hospitalization = 1
+labs = 1
+medication_admin_continuous = 1
+medication_admin_intermittent = 1
+microbiology_culture = 1
+microbiology_susceptibility = 1
+patient = 1
+patient_assessments = 1
+patient_procedures = 1
+position = 1
+respiratory_support = 1
+vitals = 1
+
+[rules]
+replace_patient_id = 1
+replace_hospitalization_id = 1
+replace_other_ids = 1
+remove_stray_ids = 1
+remove_rare_diagnoses = 1
+diagnosis_min_hospitalizations = 10
+cap_age_over_89 = 1
+null_birth_date = 1
+remove_death_time = 1
+time_shift = 1
+max_offset_days = 45
+
+[rules.geocode]
+zipcode_nine_digit = 1
+zipcode_five_digit = 1
+census_block_code = 1
+census_block_group_code = 1
+census_tract = 1
+state_code = 1
+county_code = 1
+fips_version = 1
