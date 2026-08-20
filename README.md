@@ -17,14 +17,14 @@ output under your institution's privacy and governance process.
 uv sync
 ```
 
-Polars is the only runtime dependency. The project does not provide pip,
-Conda, Poetry, or `requirements.txt` workflows.
+Polars and PyYAML are the runtime dependencies. The project does not provide
+pip, Conda, Poetry, or `requirements.txt` workflows.
 
 ## Configuration
 
-Start with `config.example.toml`. All table and rule switches must be integer
-`0` or `1`; TOML booleans are intentionally rejected. Relative paths are
-resolved relative to the configuration file.
+Start with `config.example.yaml`. Every rule is documented inline. All table
+and rule switches must be integer `0` or `1`; YAML booleans are intentionally
+rejected. Relative paths are resolved relative to the configuration file.
 
 Every CLIF 2.1 table must have a selection flag. A selected table is read from
 `<input_dir>/clif_<table>.parquet` and written with the same filename. The
@@ -37,14 +37,14 @@ Version `3.0` is recognized but rejected until its finalized schema is supplied.
 ## Usage
 
 ```bash
-uv run clif-deid config.toml
+uv run clif-deid config.yaml
 ```
 
 The default shareable output is `CLIF-DEID/De-id`. Existing output is not
 replaced unless explicitly requested:
 
 ```bash
-uv run clif-deid config.toml --overwrite
+uv run clif-deid config.yaml --overwrite
 ```
 
 ## Rules

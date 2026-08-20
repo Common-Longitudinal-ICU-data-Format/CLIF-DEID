@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 
 TABLES = (
@@ -79,8 +80,8 @@ def _project_root() -> Path:
     raise ConfigError("Could not locate the CLIF-DEID project root")
 
 
-def _check_keys(data: dict[str, Any], allowed: set[str], location: str) -> None:
-    unknown = sorted(set(data) - allowed)
+def _check_keys(data: dict[Any, Any], allowed: set[str], location: str) -> None:
+    unknown = sorted(str(key) for key in data if key not in allowed)
     if unknown:
         raise ConfigError(f"Unknown {location} key(s): {', '.join(unknown)}")
 
@@ -109,12 +110,15 @@ def _resolve_path(value: Any, config_dir: Path, location: str) -> Path:
 def load_config(path: str | Path) -> Config:
     config_path = Path(path).expanduser().resolve()
     try:
-        with config_path.open("rb") as handle:
-            raw = tomllib.load(handle)
+        with config_path.open(encoding="utf-8") as handle:
+            raw = yaml.safe_load(handle)
     except FileNotFoundError as exc:
         raise ConfigError(f"Configuration file not found: {config_path}") from exc
-    except tomllib.TOMLDecodeError as exc:
-        raise ConfigError(f"Invalid TOML in {config_path}: {exc}") from exc
+    except yaml.YAMLError as exc:
+        raise ConfigError(f"Invalid YAML in {config_path}: {exc}") from exc
+
+    if not isinstance(raw, dict):
+        raise ConfigError("Configuration must be a YAML mapping")
 
     _check_keys(
         raw,
@@ -148,7 +152,7 @@ def load_config(path: str | Path) -> Config:
 
     table_raw = _required(raw, "tables", "top-level")
     if not isinstance(table_raw, dict):
-        raise ConfigError("tables must be a TOML table")
+        raise ConfigError("tables must be a YAML mapping")
     _check_keys(table_raw, set(TABLES), "tables")
     missing_tables = [name for name in TABLES if name not in table_raw]
     if missing_tables:
@@ -161,7 +165,7 @@ def load_config(path: str | Path) -> Config:
 
     rules_raw = _required(raw, "rules", "top-level")
     if not isinstance(rules_raw, dict):
-        raise ConfigError("rules must be a TOML table")
+        raise ConfigError("rules must be a YAML mapping")
     rule_names = {
         "replace_patient_id",
         "replace_hospitalization_id",
@@ -190,7 +194,7 @@ def load_config(path: str | Path) -> Config:
 
     geocode_raw = rules_raw["geocode"]
     if not isinstance(geocode_raw, dict):
-        raise ConfigError("rules.geocode must be a TOML table")
+        raise ConfigError("rules.geocode must be a YAML mapping")
     _check_keys(geocode_raw, set(GEOCODE_COLUMNS), "rules.geocode")
     missing_geocodes = [name for name in GEOCODE_COLUMNS if name not in geocode_raw]
     if missing_geocodes:

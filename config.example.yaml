@@ -1,0 +1,69 @@
+version: "2.1"
+input_dir: /path/to/clif-tables
+# Defaults to CLIF-DEID/De-id when omitted.
+# output_dir: /path/to/deidentified-output
+# Defaults to CLIF-DEID/Non-Share when omitted.
+# non_share_dir: /path/to/private-audit
+
+# Set a table to 1 to process it or 0 to exclude it from the output.
+tables:
+  adt: 1
+  code_status: 1
+  crrt_therapy: 1
+  hospital_diagnosis: 1
+  hospitalization: 1
+  labs: 1
+  medication_admin_continuous: 1
+  medication_admin_intermittent: 1
+  microbiology_culture: 1
+  microbiology_susceptibility: 1
+  patient: 1
+  patient_assessments: 1
+  patient_procedures: 1
+  position: 1
+  respiratory_support: 1
+  vitals: 1
+
+# Set a transformation to 1 to enable it or 0 to disable it.
+rules:
+  # Replace patient IDs with random 32-character UUID hex strings.
+  replace_patient_id: 1
+  # Replace hospitalization and joined-hospitalization IDs.
+  replace_hospitalization_id: 1
+  # Replace all other recognized ID fields while preserving relationships.
+  replace_other_ids: 1
+  # Drop rows with unknown, null, or mismatched patient/hospitalization IDs.
+  remove_stray_ids: 1
+  # Drop diagnosis codes that occur in too few distinct hospitalizations.
+  remove_rare_diagnoses: 1
+  # Minimum distinct hospitalizations required to retain a diagnosis code.
+  diagnosis_min_hospitalizations: 10
+  # Replace ages greater than 89 with 89.
+  cap_age_over_89: 1
+  # Replace every birth_date value with null.
+  null_birth_date: 1
+  # Truncate non-null death_dttm values to midnight after time shifting.
+  remove_death_time: 1
+  # Shift each patient's dates and datetimes by one consistent random offset.
+  time_shift: 1
+  # Maximum absolute whole-day offset used by time_shift.
+  max_offset_days: 45
+
+  # Each enabled geocode rule nulls the named column while preserving its type.
+  geocode:
+    # Null nine-digit ZIP codes.
+    zipcode_nine_digit: 1
+    # Null five-digit ZIP codes.
+    zipcode_five_digit: 1
+    # Null census block codes.
+    census_block_code: 1
+    # Null census block group codes.
+    census_block_group_code: 1
+    # Null census tract values.
+    census_tract: 1
+    # Null state codes.
+    state_code: 1
+    # Null county codes.
+    county_code: 1
+    # Null FIPS version values.
+    fips_version: 1

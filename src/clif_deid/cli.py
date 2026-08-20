@@ -12,7 +12,7 @@ def _parser() -> argparse.ArgumentParser:
         prog="clif-deid",
         description="De-identify selected CLIF Parquet tables",
     )
-    parser.add_argument("config", help="Path to the TOML configuration file")
+    parser.add_argument("config", help="Path to the YAML configuration file")
     parser.add_argument(
         "--overwrite",
         action="store_true",

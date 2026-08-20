@@ -21,34 +21,33 @@ def _write_config(
     time_shift: int = 1,
 ) -> Path:
     table_lines = "\n".join(
-        f"{table} = {1 if table in selected else 0}" for table in TABLES
+        f"  {table}: {1 if table in selected else 0}" for table in TABLES
     )
-    geocode_lines = "\n".join(f"{column} = 1" for column in GEOCODE_COLUMNS)
-    text = f'''version = "{version}"
-input_dir = "{root / 'input'}"
-output_dir = "{root / 'output'}"
-non_share_dir = "{root / 'private'}"
+    geocode_lines = "\n".join(f"    {column}: 1" for column in GEOCODE_COLUMNS)
+    text = f'''version: "{version}"
+input_dir: "{root / 'input'}"
+output_dir: "{root / 'output'}"
+non_share_dir: "{root / 'private'}"
 
-[tables]
+tables:
 {table_lines}
 
-[rules]
-replace_patient_id = 1
-replace_hospitalization_id = 1
-replace_other_ids = 1
-remove_stray_ids = {remove_stray_ids}
-remove_rare_diagnoses = 1
-diagnosis_min_hospitalizations = 2
-cap_age_over_89 = 1
-null_birth_date = 1
-remove_death_time = 1
-time_shift = {time_shift}
-max_offset_days = 45
-
-[rules.geocode]
+rules:
+  replace_patient_id: 1
+  replace_hospitalization_id: 1
+  replace_other_ids: 1
+  remove_stray_ids: {remove_stray_ids}
+  remove_rare_diagnoses: 1
+  diagnosis_min_hospitalizations: 2
+  cap_age_over_89: 1
+  null_birth_date: 1
+  remove_death_time: 1
+  time_shift: {time_shift}
+  max_offset_days: 45
+  geocode:
 {geocode_lines}
 '''
-    path = root / "config.toml"
+    path = root / "config.yaml"
     path.write_text(text, encoding="utf-8")
     return path
 
@@ -459,7 +458,9 @@ class PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             path = _write_config(root, {"patient"})
-            text = path.read_text(encoding="utf-8").replace("patient = 1", "patient = true")
+            text = path.read_text(encoding="utf-8").replace(
+                "  patient: 1", "  patient: true"
+            )
             path.write_text(text, encoding="utf-8")
             with self.assertRaisesRegex(ConfigError, "integer 0 or 1"):
                 load_config(path)
