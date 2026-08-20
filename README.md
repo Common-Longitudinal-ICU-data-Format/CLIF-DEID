@@ -107,3 +107,16 @@ Tests create synthetic Parquet data using Polars only:
 ```bash
 uv run python -m unittest discover -s tests -v
 ```
+
+An opt-in integration suite runs all 16 supported tables and checks row
+accounting, identifier mappings, foreign-key relationships, longitudinal date
+shifts, schemas, and direct de-identification rules against real data. Public
+output and private audit artifacts are created in a temporary directory and
+removed after the suite. Failures report aggregate counts only.
+
+```bash
+CLIF_DEID_REAL_DATA_DIR=/path/to/clif-tables \
+  uv run python -m unittest tests.test_real_data -v
+```
+
+Set `CLIF_DEID_REAL_TEST_TMPDIR` to place the temporary run on a specific disk.
